@@ -110,7 +110,7 @@ manage jenkins-->crenditials-->glbal--> add credential
 on Jenkins Debian machine 
  -install git,docker
  
-permission 
+permission give
  -sudo usermod -aG docker Jenkins  (put docker in Jenkins)
  -
 restart jenkins
