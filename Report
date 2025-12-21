@@ -1,0 +1,116 @@
+Jenkins
+
+---
+1  sudo apt update
+2  sudo apt install docker.io -y
+3  nano jenkins.sh
+4  sudo bash jenkins.sh
+5  sudo usermod -aG docker jenkins
+6  sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+7  nano Dockerfile
+8  nano Jenkinsfile
+9  nano index.html
+10  git init
+11  git add .
+12  git branch
+13  git commit -m "mycommit"
+14  git branch
+15  git branch -M main
+16  git branch
+17  git remote add origin https://github.com/RohitGaj/exam.git
+18  git push -u origin main
+19 sudo systemctl restart jenkins
+---
+
+create instance with permission of ssh,http,8080
+generate new key-pair
+take public ip of instance connect with second machine (if Debian username-admin)
+install Jenkins (script)
+
+#!/bin/bash
+
+sudo apt update
+sudo apt install fontconfig openjdk-21-jre
+sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt update
+sudo apt install jenkins
+
+
+use public ip of instance
+ - in browser <public ip>:8080
+ - open Jenkins and show one path open that in Linux it give password put in Jenkins 
+ - create admin user
+
+ -create freestyle project
+ -give git repo url (HTTP)
+ -SCM -> git -> repo url -> http
+ -trigger when pull
+ -save change
+
+
+connect Jenkins to GitHub
+-go to GitHub -> repo -> setting -> webhook
+-add webhook -> url -> http://<ip>:8080/github-webhook/
+-content type -json 
+-just push event ->active ->add webhook
+
+create new pipeline
+SCM-GIT
+-paste git https url
+-pull trigger
+
+in git
+
+
+ - create a dockerfile
+             
+            FROM nginx:latest
+            RUN rm -rf /usr/share/nginx/html/*
+            COPY . /usr/share/share/html/
+            EXPOSE 80
+            CMD ["nginx","-g","daemon off;"]
+
+
+
+ - create Jenkinsfile
+
+           pipeline {
+    agent any
+
+    stages {
+        stage('GitHub config') {
+            steps {
+                git url:'<GitHub url>', branch:'main'
+            }
+        }
+        stage('Docker image build') {
+            steps {
+                sh 'docker build -t myapp .'
+            }
+        }
+        stage('Docker container build') {
+            steps {
+                sh 'docker rm -f myappcontainer || true'
+                sh 'docker run -d --name myappcontainer -p 80:80 myapp' 
+            }
+        }
+    }
+}
+
+Create personal access token in GitHub
+-copy token
+
+add in Jenkins
+manage jenkins-->crenditials-->glbal--> add credential
+
+on Jenkins Debian machine 
+ -install git,docker
+ 
+permission 
+ -sudo usermod -aG docker Jenkins  (put docker in Jenkins)
+ -
+restart jenkins
